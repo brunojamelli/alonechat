@@ -21,16 +21,19 @@ public class MainActivity extends AppCompatActivity {
         tabLayout = (TabLayout) findViewById(R.id.tab);
         tabLayout.setupWithViewPager(vp);
 
+        tabLayout.getTabAt(0).setIcon(R.drawable.camera);
+        tabLayout.getTabAt(1).setIcon(R.drawable.chat);
+        tabLayout.getTabAt(2).setIcon(R.drawable.maps);
         vp.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
                 switch (position){
                     case 0:
-                        //tabLayout.getTabAt(0).setIcon(android.R.drawable);
+                        //tabLayout.getTabAt(0).setIcon(R.drawable.camera);
                     case 1:
-                        //tabLayout.getTabAt(1).setIcon(android.R.drawable.ic_mapa);
+                        //tabLayout.getTabAt(1).setIcon(R.drawable.chat);
                     case 2:
-                        //tabLayout.getTabAt(2).setIcon(android.R.drawable.btn_star_big_on);
+                        //tabLayout.getTabAt(2).setIcon(R.drawable.maps);
                     default:
                         return;
                 }

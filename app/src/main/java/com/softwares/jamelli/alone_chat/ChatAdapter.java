@@ -38,7 +38,7 @@ public class ChatAdapter extends FragmentPagerAdapter {
     public CharSequence getPageTitle(int position){
         switch (position){
             case 0:
-                return "Camera";
+                return "";
             case 1:
                 return "Chat";
             case 2:
