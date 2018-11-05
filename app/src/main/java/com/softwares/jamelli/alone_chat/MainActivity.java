@@ -18,12 +18,12 @@ public class MainActivity extends AppCompatActivity {
         ViewPager vp = findViewById(R.id.pager);
         PagerAdapter pa = new ChatAdapter(getSupportFragmentManager());
         vp.setAdapter(pa);
-        tabLayout = (TabLayout) findViewById(R.id.tab);
+        tabLayout = findViewById(R.id.tab);
         tabLayout.setupWithViewPager(vp);
 
-        tabLayout.getTabAt(0).setIcon(R.drawable.camera);
-        tabLayout.getTabAt(1).setIcon(R.drawable.chat);
-        tabLayout.getTabAt(2).setIcon(R.drawable.maps);
+        tabLayout.getTabAt(0).setIcon(R.drawable.camera2);
+     //   tabLayout.getTabAt(1).setIcon(R.drawable.chat);
+     //   tabLayout.getTabAt(2).setIcon(R.drawable.maps);
         vp.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
