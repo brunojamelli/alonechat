@@ -1,5 +1,7 @@
 package com.softwares.jamelli.alone_chat.model;
 
+import java.util.Date;
+
 /**
  * Copyright Google Inc. All Rights Reserved.
  *
@@ -17,7 +19,7 @@ package com.softwares.jamelli.alone_chat.model;
  */
 
 public class FriendlyMessage {
-
+    private Date data_envio;
     private String text;
     private String name;
     private String photoUrl;
@@ -26,6 +28,14 @@ public class FriendlyMessage {
     }
 
     public FriendlyMessage(String text, String name, String photoUrl) {
+        this.text = text;
+        this.name = name;
+        this.photoUrl = photoUrl;
+    }
+
+
+    public FriendlyMessage(Date data_envio, String text, String name, String photoUrl) {
+        this.data_envio = data_envio;
         this.text = text;
         this.name = name;
         this.photoUrl = photoUrl;
@@ -53,5 +63,13 @@ public class FriendlyMessage {
 
     public void setPhotoUrl(String photoUrl) {
         this.photoUrl = photoUrl;
+    }
+
+    public Date getData_envio() {
+        return data_envio;
+    }
+
+    public void setData_envio(Date data_envio) {
+        this.data_envio = data_envio;
     }
 }

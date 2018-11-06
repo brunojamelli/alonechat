@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "863327827825",
+    "firebase_url": "https://chatjamelli.firebaseio.com",
+    "project_id": "chatjamelli",
+    "storage_bucket": "chatjamelli.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:863327827825:android:2bdbcf8b2723ca46",
+        "android_client_info": {
+          "package_name": "com.softwares.jamelli.alone_chat"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "863327827825-4e3rbihfhgue73ik91vldffi14u1s04o.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.softwares.jamelli.alone_chat",
+            "certificate_hash": "ad5b53bb7654447cdf693a6bed66eed9d6d0df6a"
+          }
+        },
+        {
+          "client_id": "863327827825-re9kk137t2939frlesroujncs3ukmuep.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyABBjYlft4k4uO-ForImFD_kOxXZVguVEM"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "863327827825-re9kk137t2939frlesroujncs3ukmuep.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
