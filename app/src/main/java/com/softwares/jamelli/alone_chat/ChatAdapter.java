@@ -12,11 +12,11 @@ import com.softwares.jamelli.alone_chat.fragment.FragmentChat;
 import com.softwares.jamelli.alone_chat.fragment.FragmentMaps;
 
 public class ChatAdapter extends FragmentPagerAdapter {
-    String user;
-    public ChatAdapter(FragmentManager fm,String user){
+    //String user;
+    public ChatAdapter(FragmentManager fm){
 
         super(fm);
-        this.user = user;
+        //this.user = user;
 
     }
 
@@ -26,11 +26,7 @@ public class ChatAdapter extends FragmentPagerAdapter {
             case 0:
                 return new FragmentCamera();
             case 1:
-                FragmentChat fc = new FragmentChat();
-                Bundle data = new Bundle();
-                data.putString("user",user);
-                fc.setArguments(data);
-                return fc;
+                return new FragmentChat();
             case 2:
                 return new FragmentMaps();
             default:

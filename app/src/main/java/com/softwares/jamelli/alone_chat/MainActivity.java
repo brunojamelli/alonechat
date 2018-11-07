@@ -11,6 +11,8 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 
+import com.firebase.ui.auth.AuthUI;
+
 public class MainActivity extends AppCompatActivity {
     TabLayout tabLayout;
     ViewPager vp;
@@ -58,12 +60,21 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        return super.onOptionsItemSelected(item);
+        switch (item.getItemId()){
+            case R.id.sign_out_menu:{
+//logout
+                AuthUI.getInstance().signOut(this);
+                return true;
+            }
+            default:{
+                return super.onOptionsItemSelected(item);
+            }
+        }
     }
 
     public void initTabLayout(){
         vp = findViewById(R.id.pager);
-        pa = new ChatAdapter(getSupportFragmentManager(),"bruno");
+        pa = new ChatAdapter(getSupportFragmentManager());
         vp.setAdapter(pa);
         tabLayout = findViewById(R.id.tab);
         tabLayout.setupWithViewPager(vp);
