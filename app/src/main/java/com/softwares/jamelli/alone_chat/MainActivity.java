@@ -63,7 +63,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void initTabLayout(){
         vp = findViewById(R.id.pager);
-        pa = new ChatAdapter(getSupportFragmentManager());
+        pa = new ChatAdapter(getSupportFragmentManager(),"bruno");
         vp.setAdapter(pa);
         tabLayout = findViewById(R.id.tab);
         tabLayout.setupWithViewPager(vp);

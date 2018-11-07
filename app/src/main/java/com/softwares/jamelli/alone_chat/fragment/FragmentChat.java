@@ -49,8 +49,11 @@ public class FragmentChat extends Fragment{
         //conteudo do fragment
         fb = FirebaseDatabase.getInstance();
         msg = fb.getReference().child("messages");
+        //pegando o bundle
+        Bundle data = getArguments();
 
         mUsername = ANONYMOUS;
+        mUsername = data.getString("user");
         //implementando o lister do banco de dados
         listener = new ChildEventListener() {
             @Override
