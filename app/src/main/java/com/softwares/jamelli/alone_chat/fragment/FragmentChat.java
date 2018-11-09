@@ -35,6 +35,9 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+import com.facebook.FacebookSdk;
+import com.facebook.appevents.AppEventsLogger;
+
 import static android.app.Activity.RESULT_CANCELED;
 import static android.app.Activity.RESULT_OK;
 
@@ -60,6 +63,8 @@ public class FragmentChat extends Fragment{
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle b){
         View v = inflater.inflate(R.layout.fragment_chat, container, false);
+        FacebookSdk.sdkInitialize(getContext());
+        AppEventsLogger.activateApp(getContext());
         //instanciando os objetos para fazer o login
         fb = FirebaseDatabase.getInstance();
         msg = fb.getReference().child("messages");
@@ -77,15 +82,18 @@ public class FragmentChat extends Fragment{
                 }else{
                     //não-logado
                     onSignOutCleanUp();
+
                     //chama o fluxo de login
+                    List<AuthUI.IdpConfig> providers = Arrays.asList(
+                            new AuthUI.IdpConfig.EmailBuilder().build(),
+                            new AuthUI.IdpConfig.GoogleBuilder().build(),
+                            new AuthUI.IdpConfig.FacebookBuilder().setPermissions(Arrays.asList("user_friends")).build());
+
                     startActivityForResult(
                             AuthUI.getInstance()
                                     .createSignInIntentBuilder()
                                     .setIsSmartLockEnabled(false)
-                                    .setAvailableProviders(
-                                            Arrays.asList(
-                                                    new AuthUI.IdpConfig.GoogleBuilder().build(),
-                                                    new AuthUI.IdpConfig.EmailBuilder().build()))
+                                    .setAvailableProviders(providers)
                                     .build(),
                             CODIGO_LOGAR);
                 }

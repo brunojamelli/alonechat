@@ -2,4 +2,9 @@
     <string name="app_name">alone-chat</string>
     <string name="enviar">Enviar</string>
     <string name="sair">Sair</string>
+    <string name="facebook_application_id" translatable="false">717369365300176</string>
+    <string name="facebook_app_id">717369365300176</string>
+    <string name="fb_login_protocol_scheme">fb717369365300176</string>
+    <string name="facebook_login_protocol_scheme" translatable="false">fb717369365300176</string>
+
 </resources>
