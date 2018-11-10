@@ -5,6 +5,8 @@
     android:layout_height="wrap_content"
     android:layout_marginLeft="16dp"
     android:layout_marginStart="16dp"
+    android:background="@color/colorWhite"
+    android:textColor="@color/colorLaranja"
     android:orientation="vertical">
 
     <ImageView
@@ -28,6 +30,7 @@
         android:layout_weight="0"
         android:textAppearance="?android:attr/textAppearanceSmall"
         tools:text="Name" />
+
     <TextView
         android:id="@+id/dataTextView"
         android:layout_width="wrap_content"

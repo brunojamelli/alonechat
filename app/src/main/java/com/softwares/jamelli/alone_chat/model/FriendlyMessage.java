@@ -23,7 +23,7 @@ public class FriendlyMessage {
     private String text;
     private String name;
     private String photoUrl;
-
+    private boolean localization;
     public FriendlyMessage() {
     }
 
@@ -39,6 +39,15 @@ public class FriendlyMessage {
         this.text = text;
         this.name = name;
         this.photoUrl = photoUrl;
+        this.localization = false;
+    }
+
+    public boolean isLocalization() {
+        return localization;
+    }
+
+    public void setLocalization(boolean localization) {
+        this.localization = localization;
     }
 
     public String getText() {

@@ -38,7 +38,9 @@ public class MessageAdapter extends ArrayAdapter<FriendlyMessage> {
             Glide.with(photoImageView.getContext())
                     .load(message.getPhotoUrl())
                     .into(photoImageView);
-        } else {
+        } else if(message.isLocalization()){
+
+        }else {
             messageTextView.setVisibility(View.VISIBLE);
             photoImageView.setVisibility(View.GONE);
             messageTextView.setText(message.getText());
