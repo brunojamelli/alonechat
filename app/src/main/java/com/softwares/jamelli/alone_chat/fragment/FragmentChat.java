@@ -1,9 +1,9 @@
 package com.softwares.jamelli.alone_chat.fragment;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -16,10 +16,10 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.ListView;
 import android.widget.Toast;
 
 import com.firebase.ui.auth.AuthUI;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.ChildEventListener;
@@ -27,6 +27,9 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 import com.softwares.jamelli.alone_chat.MessageAdapter;
 import com.softwares.jamelli.alone_chat.MessageAdapterN;
 import com.softwares.jamelli.alone_chat.R;
@@ -40,40 +43,47 @@ import java.util.List;
 
 import com.facebook.FacebookSdk;
 import com.facebook.appevents.AppEventsLogger;
+import com.softwares.jamelli.alone_chat.util.ToolBox;
 
 import static android.app.Activity.RESULT_CANCELED;
 import static android.app.Activity.RESULT_OK;
 
 public class FragmentChat extends Fragment{
+    //constantes de configuração do fragment de mensagens
+    public static final String ANONYMOUS = "anonymous";
+    public static final int DEFAULT_MSG_LENGTH_LIMIT = 1000;
+    private static final int LOGIN_CODE = 56;
+    private static final int PICTURE_CODE = 57;
+    //objetos do firebase para manipulação de arquivos e acesso ao realtime database
     private FirebaseDatabase fb;
     private DatabaseReference msg;
     private ChildEventListener listener;
-    public static final String ANONYMOUS = "anonymous";
-    public static final int DEFAULT_MSG_LENGTH_LIMIT = 1000;
-
-    private ListView mMessageListView;
-    private MessageAdapter mMessageAdapter;
+    private FirebaseStorage mFirebaseStorage;
+    private StorageReference mStorageReference;
+    //objetos da view
     private MessageAdapterN adapter;
     private ImageButton mPhotoPickerButton;
     private EditText mMessageEditText;
     private Button mSendButton;
+    private RecyclerView rv;
     //objetos usados para a implementação do login
-    private static final int CODIGO_LOGAR = 55 ;
     private FirebaseAuth mFirebaseAuth;
     private FirebaseAuth.AuthStateListener mAuthStateListener;
     private List<FriendlyMessage> friendlyMessages;
-    private RecyclerView rv;
     private String mUsername;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle b){
         View v = inflater.inflate(R.layout.fragment_chat, container, false);
         FacebookSdk.sdkInitialize(getContext());
         AppEventsLogger.activateApp(getContext());
-        //instanciando os objetos para fazer o login
+        //instanciando os objetos de acesso ao banco
         fb = FirebaseDatabase.getInstance();
         msg = fb.getReference().child("messages");
         mFirebaseAuth = FirebaseAuth.getInstance();
-
+        //instanciando os objetos para gerenciar arquivos no firebase
+        mFirebaseStorage = FirebaseStorage.getInstance();
+        mStorageReference = mFirebaseStorage.getReference().child("photos_app_jamelli");
         mUsername = ANONYMOUS;
         //implementando o listener do firebase auth
         mAuthStateListener = new FirebaseAuth.AuthStateListener() {
@@ -99,7 +109,7 @@ public class FragmentChat extends Fragment{
                                     .setIsSmartLockEnabled(false)
                                     .setAvailableProviders(providers)
                                     .build(),
-                            CODIGO_LOGAR);
+                            LOGIN_CODE);
                 }
             }
         };
@@ -142,15 +152,22 @@ public class FragmentChat extends Fragment{
         mSendButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Date data = new Date();
-                Calendar cal = Calendar.getInstance();
-                cal.setTime(data);
-                Date data_atual = cal.getTime();
 
-                FriendlyMessage fm = new FriendlyMessage(data_atual,mMessageEditText.getText().toString(),mUsername,null);
+                Date currentDate = ToolBox.currentDate();
+
+                FriendlyMessage fm = new FriendlyMessage(currentDate,mMessageEditText.getText().toString(),mUsername,null);
                 msg.push().setValue(fm);
                 // Clear input box
                 mMessageEditText.setText("");
+            }
+        });
+        mPhotoPickerButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+                intent.setType("image/jpeg");
+                intent.putExtra(Intent.EXTRA_LOCAL_ONLY, true);
+                startActivityForResult(Intent.createChooser(intent, "Complete action using"), PICTURE_CODE);
             }
         });
         return v;
@@ -176,13 +193,32 @@ public class FragmentChat extends Fragment{
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == CODIGO_LOGAR){
+        if (requestCode == LOGIN_CODE){
             if (resultCode == RESULT_OK){
                 Toast.makeText(getContext(), "Bem-vindo", Toast.LENGTH_SHORT).show();
             }else if (resultCode == RESULT_CANCELED){
                 //finish();
 
             }
+        }else if (requestCode == PICTURE_CODE && resultCode == RESULT_OK){
+            Uri selectedImageUri = data.getData();
+            StorageReference photoref = mStorageReference.child(mUsername + "_" + selectedImageUri.getLastPathSegment());
+            //para upload da imagem basta photoref.putFile(selectedImageUri);
+            //addOnSuccessListener para saber quando a imagem foi enviada
+            photoref.putFile(selectedImageUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                @Override
+                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                // Get a URL to the uploaded content
+                    taskSnapshot.getStorage().getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                        @Override
+                        public void onSuccess(Uri uri) {
+                            Date data_atual = ToolBox.currentDate();
+                            FriendlyMessage friendlyMessage = new FriendlyMessage(data_atual,null, mUsername, uri.toString());
+                            msg.push().setValue(friendlyMessage);
+                        }
+                    });
+                }
+            });
         }
     }
 
@@ -192,12 +228,11 @@ public class FragmentChat extends Fragment{
                 @Override
                 public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                     FriendlyMessage friendlyMessage = dataSnapshot.getValue(FriendlyMessage.class);
-                    //mMessageAdapter.add(friendlyMessage);
                     friendlyMessages.add(friendlyMessage);
-                    //MessageAdapterN ma = new MessageAdapterN(getContext(),friendlyMessages);
                     adapter = new MessageAdapterN(getContext(),friendlyMessages);
                     rv.setAdapter(adapter);
-                } @Override
+                }
+                @Override
                 public void onChildChanged(DataSnapshot dataSnapshot, String s) {}
                 @Override
                 public void onChildRemoved(DataSnapshot dataSnapshot) {}
@@ -223,7 +258,8 @@ public class FragmentChat extends Fragment{
     }
     private void onSignOutCleanUp() {
         mUsername = ANONYMOUS;
-        mMessageAdapter.clear();
+        //mMessageAdapter.clear();
+        friendlyMessages.clear();
         detachDatabaseReadListener();
     }
 }

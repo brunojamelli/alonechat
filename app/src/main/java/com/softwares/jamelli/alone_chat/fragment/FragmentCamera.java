@@ -16,7 +16,7 @@ import com.softwares.jamelli.alone_chat.R;
 import static android.app.Activity.RESULT_OK;
 
 public class FragmentCamera extends Fragment {
-    private final int CODE_CAMERA = 66;
+    private final int CODE_CAMERA = 55;
     private Button btn_camera;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle b){

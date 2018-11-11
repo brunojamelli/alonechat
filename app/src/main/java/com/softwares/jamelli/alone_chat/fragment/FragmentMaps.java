@@ -45,7 +45,7 @@ public class FragmentMaps extends Fragment implements OnMapReadyCallback,
         GoogleMap.OnMyLocationClickListener,
         GoogleMap.OnMyLocationButtonClickListener {
     private GoogleMap mMap;
-    private final int CODE_LOCATION = 55;
+    private final int CODE_LOCATION = 58;
     private FusedLocationProviderClient locationClient;
     private Button btnSend;
     private Location myLocation;
