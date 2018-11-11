@@ -5,6 +5,8 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.InputFilter;
 import android.text.TextWatcher;
@@ -26,6 +28,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.softwares.jamelli.alone_chat.MessageAdapter;
+import com.softwares.jamelli.alone_chat.MessageAdapterN;
 import com.softwares.jamelli.alone_chat.R;
 import com.softwares.jamelli.alone_chat.model.FriendlyMessage;
 
@@ -50,6 +53,7 @@ public class FragmentChat extends Fragment{
 
     private ListView mMessageListView;
     private MessageAdapter mMessageAdapter;
+    private MessageAdapterN adapter;
     private ImageButton mPhotoPickerButton;
     private EditText mMessageEditText;
     private Button mSendButton;
@@ -57,8 +61,8 @@ public class FragmentChat extends Fragment{
     private static final int CODIGO_LOGAR = 55 ;
     private FirebaseAuth mFirebaseAuth;
     private FirebaseAuth.AuthStateListener mAuthStateListener;
-
-
+    private List<FriendlyMessage> friendlyMessages;
+    private RecyclerView rv;
     private String mUsername;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle b){
@@ -101,15 +105,19 @@ public class FragmentChat extends Fragment{
         };
 
         // Initialize references to views
-        mMessageListView =  v.findViewById(R.id.messageListView);
+        rv = v.findViewById(R.id.screenMessages);
+        //mMessageListView =  v.findViewById(R.id.messageListView);
         mPhotoPickerButton = v.findViewById(R.id.photoPickerButton);
         mMessageEditText =  v.findViewById(R.id.messageEditText);
         mSendButton = v.findViewById(R.id.sendButton);
         // Initialize message ListView and its adapter
-        List<FriendlyMessage> friendlyMessages = new ArrayList<>();
-        mMessageAdapter = new MessageAdapter(getContext(), R.layout.item_message, friendlyMessages);
-        mMessageListView.setAdapter(mMessageAdapter);
-
+        friendlyMessages = new ArrayList<>();
+        //mMessageAdapter = new MessageAdapter(getContext(), R.layout.item_message, friendlyMessages);
+        //mMessageListView.setAdapter(mMessageAdapter);
+        adapter = new MessageAdapterN(getContext(),friendlyMessages);
+        rv.setAdapter(adapter);
+        RecyclerView.LayoutManager layout = new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false);
+        rv.setLayoutManager(layout);
         mMessageEditText.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -161,7 +169,8 @@ public class FragmentChat extends Fragment{
             mFirebaseAuth.removeAuthStateListener(mAuthStateListener);
         }
         detachDatabaseReadListener();
-        mMessageAdapter.clear();
+        //mMessageAdapter.clear();
+        friendlyMessages.clear();
     }
 
     @Override
@@ -183,9 +192,12 @@ public class FragmentChat extends Fragment{
                 @Override
                 public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                     FriendlyMessage friendlyMessage = dataSnapshot.getValue(FriendlyMessage.class);
-                    mMessageAdapter.add(friendlyMessage);
-                } @
-                        Override
+                    //mMessageAdapter.add(friendlyMessage);
+                    friendlyMessages.add(friendlyMessage);
+                    //MessageAdapterN ma = new MessageAdapterN(getContext(),friendlyMessages);
+                    adapter = new MessageAdapterN(getContext(),friendlyMessages);
+                    rv.setAdapter(adapter);
+                } @Override
                 public void onChildChanged(DataSnapshot dataSnapshot, String s) {}
                 @Override
                 public void onChildRemoved(DataSnapshot dataSnapshot) {}

@@ -10,6 +10,7 @@
     android:paddingTop="16dp"
     tools:context=".MainActivity">
 
+    <!--
     <ListView
         android:id="@+id/messageListView"
         android:layout_width="match_parent"
@@ -19,7 +20,12 @@
         android:divider="@android:color/transparent"
         android:transcriptMode="alwaysScroll"
         tools:listitem="@layout/item_message"/>
-
+    -->
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/screenMessages"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        />
     <LinearLayout
         android:id="@+id/linearLayout"
         android:layout_width="match_parent"
