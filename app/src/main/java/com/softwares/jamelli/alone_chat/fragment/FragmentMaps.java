@@ -13,6 +13,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -27,7 +28,18 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.softwares.jamelli.alone_chat.R;
+import com.softwares.jamelli.alone_chat.model.FriendlyMessage;
+
+import java.util.Calendar;
+import java.util.Date;
 
 public class FragmentMaps extends Fragment implements OnMapReadyCallback,
         GoogleMap.OnMyLocationClickListener,
@@ -35,22 +47,40 @@ public class FragmentMaps extends Fragment implements OnMapReadyCallback,
     private GoogleMap mMap;
     private final int CODE_LOCATION = 55;
     private FusedLocationProviderClient locationClient;
+    private Button btnSend;
     private Location myLocation;
-    public static FragmentMaps newInstance() {
-        FragmentMaps fragment = new FragmentMaps();
-        return fragment;
-    }
+    private ChildEventListener listenerDB;
+    private FirebaseDatabase fdata;
+    private DatabaseReference freference;
+    private FirebaseAuth fauth;
 
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle b) {
-
-
         View view = inflater.inflate(R.layout.fragment_maps, null, false);
         SupportMapFragment mapFragment = (SupportMapFragment) this.getChildFragmentManager().findFragmentById(R.id.mapa);
         mapFragment.getMapAsync(this);
         locationClient = LocationServices.getFusedLocationProviderClient(getActivity());
-
+        //pegando a instancia do firebase e da "tabela" de mensagens
+        fdata = FirebaseDatabase.getInstance();
+        freference = fdata.getReference().child("messages");
+        btnSend = view.findViewById(R.id.btn_enviar);
+        //pegando a instancia do auth para pegar o usuario
+        fauth = FirebaseAuth.getInstance();
+        btnSend.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                FirebaseUser user = fauth.getCurrentUser();
+                Date data = new Date();
+                Calendar cal = Calendar.getInstance();
+                cal.setTime(data);
+                Date data_atual = cal.getTime();
+                String urlMaps = "https://www.google.com.br/maps/@"+myLocation.getLatitude()+","+myLocation.getLongitude();
+                FriendlyMessage fm = new FriendlyMessage(data_atual,urlMaps,user.getDisplayName(),null);
+                freference.push().setValue(fm);
+                Toast.makeText(getActivity(),"Localização enviada com sucesso",Toast.LENGTH_SHORT).show();
+            }
+        });
         //conteudo do fragment
         return view;
     }
@@ -58,11 +88,6 @@ public class FragmentMaps extends Fragment implements OnMapReadyCallback,
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-        //gMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
-        // criando uma possição estatica no mapa
-        //LatLng cr = new LatLng(-6.24345, -36.1805);
-        //mMap.addMarker(new MarkerOptions().position(cr).title("Marcado em Campo Redondo"));
-        //mMap.moveCamera(CameraUpdateFactory.newLatLng(cr));
         if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
             mMap.setMyLocationEnabled(true);
@@ -111,16 +136,15 @@ public class FragmentMaps extends Fragment implements OnMapReadyCallback,
         @Override
         public void onMyLocationClick(@NonNull Location location) {
             //Log.i("","Current location:\n" + location);
-            Toast.makeText(getActivity(), "Current location:\n" + location, Toast.LENGTH_LONG).show();
+            Toast.makeText(getActivity(), "Localização atual :\n" + location.getTime(), Toast.LENGTH_LONG).show();
         }
 
         @Override
         public boolean onMyLocationButtonClick() {
-            Toast.makeText(getActivity(), "MyLocation button clicked", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getActivity(), "Aproximando a sua localização no mapa", Toast.LENGTH_SHORT).show();
             // Return false so that we don't consume the event and the default behavior still occurs
             // (the camera animates to the user's current position).
             return false;
         }
 
-
-}
+    }
