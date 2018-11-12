@@ -37,6 +37,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.softwares.jamelli.alone_chat.R;
 import com.softwares.jamelli.alone_chat.model.FriendlyMessage;
+import com.softwares.jamelli.alone_chat.util.ToolBox;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -71,12 +72,9 @@ public class FragmentMaps extends Fragment implements OnMapReadyCallback,
             @Override
             public void onClick(View view) {
                 FirebaseUser user = fauth.getCurrentUser();
-                Date data = new Date();
-                Calendar cal = Calendar.getInstance();
-                cal.setTime(data);
-                Date data_atual = cal.getTime();
+                Date hoje = ToolBox.currentDate();
                 String urlMaps = "https://www.google.com.br/maps/@"+myLocation.getLatitude()+","+myLocation.getLongitude();
-                FriendlyMessage fm = new FriendlyMessage(data_atual,urlMaps,user.getDisplayName(),null);
+                FriendlyMessage fm = new FriendlyMessage(hoje,urlMaps,user.getDisplayName(),null);
                 freference.push().setValue(fm);
                 Toast.makeText(getActivity(),"Localização enviada com sucesso",Toast.LENGTH_SHORT).show();
             }
@@ -106,6 +104,10 @@ public class FragmentMaps extends Fragment implements OnMapReadyCallback,
                         if (location != null) {
                             Log.i("opa",location.toString());
                             myLocation = location;
+                        }else{
+                            LatLng cr = new LatLng(-6.24345, -36.1805);
+                            mMap.addMarker(new MarkerOptions().position(cr).title("Marcado em Campo Redondo"));
+                            mMap.moveCamera(CameraUpdateFactory.newLatLng(cr));
                         }
                     }
                 });
@@ -119,11 +121,11 @@ public class FragmentMaps extends Fragment implements OnMapReadyCallback,
                     grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 if(ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED){
                     mMap.setMyLocationEnabled(true);
+                }else{
+                    LatLng cr = new LatLng(-6.24345, -36.1805);
+                    mMap.addMarker(new MarkerOptions().position(cr).title("Marcado em Campo Redondo"));
+                    mMap.moveCamera(CameraUpdateFactory.newLatLng(cr));
                 }
-            }else{
-                LatLng cr = new LatLng(-6.24345, -36.1805);
-                mMap.addMarker(new MarkerOptions().position(cr).title("Marcado em Campo Redondo"));
-                mMap.moveCamera(CameraUpdateFactory.newLatLng(cr));
             }
 
             } else {
@@ -135,15 +137,14 @@ public class FragmentMaps extends Fragment implements OnMapReadyCallback,
 
         @Override
         public void onMyLocationClick(@NonNull Location location) {
-            //Log.i("","Current location:\n" + location);
-            Toast.makeText(getActivity(), "Localização atual :\n" + location.getTime(), Toast.LENGTH_LONG).show();
+            String txtLocation = "Localização atual : [" +location.getLongitude()+","+location.getLatitude()+"]";
+            Log.i("",txtLocation);
+            Toast.makeText(getActivity(), txtLocation, Toast.LENGTH_LONG).show();
         }
 
         @Override
         public boolean onMyLocationButtonClick() {
             Toast.makeText(getActivity(), "Aproximando a sua localização no mapa", Toast.LENGTH_SHORT).show();
-            // Return false so that we don't consume the event and the default behavior still occurs
-            // (the camera animates to the user's current position).
             return false;
         }
 

@@ -116,18 +116,16 @@ public class FragmentChat extends Fragment{
 
         // Initialize references to views
         rv = v.findViewById(R.id.screenMessages);
-        //mMessageListView =  v.findViewById(R.id.messageListView);
         mPhotoPickerButton = v.findViewById(R.id.photoPickerButton);
         mMessageEditText =  v.findViewById(R.id.messageEditText);
         mSendButton = v.findViewById(R.id.sendButton);
-        // Initialize message ListView and its adapter
+        //Inicializando RecyclerView e o seu adapter
         friendlyMessages = new ArrayList<>();
-        //mMessageAdapter = new MessageAdapter(getContext(), R.layout.item_message, friendlyMessages);
-        //mMessageListView.setAdapter(mMessageAdapter);
         adapter = new MessageAdapterN(getContext(),friendlyMessages);
         rv.setAdapter(adapter);
         RecyclerView.LayoutManager layout = new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false);
         rv.setLayoutManager(layout);
+
         mMessageEditText.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -152,9 +150,7 @@ public class FragmentChat extends Fragment{
         mSendButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
                 Date currentDate = ToolBox.currentDate();
-
                 FriendlyMessage fm = new FriendlyMessage(currentDate,mMessageEditText.getText().toString(),mUsername,null);
                 msg.push().setValue(fm);
                 // Clear input box
@@ -212,8 +208,12 @@ public class FragmentChat extends Fragment{
                     taskSnapshot.getStorage().getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                         @Override
                         public void onSuccess(Uri uri) {
-                            Date data_atual = ToolBox.currentDate();
-                            FriendlyMessage friendlyMessage = new FriendlyMessage(data_atual,null, mUsername, uri.toString());
+
+                            FriendlyMessage friendlyMessage = new FriendlyMessage(
+                                    ToolBox.currentDate(),
+                                    null, mUsername,
+                                    uri.toString()
+                            );
                             msg.push().setValue(friendlyMessage);
                         }
                     });
