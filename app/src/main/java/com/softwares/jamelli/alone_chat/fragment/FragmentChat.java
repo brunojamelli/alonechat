@@ -124,6 +124,7 @@ public class FragmentChat extends Fragment{
         adapter = new MessageAdapterN(getContext(),friendlyMessages);
         rv.setAdapter(adapter);
         RecyclerView.LayoutManager layout = new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false);
+
         rv.setLayoutManager(layout);
 
         mMessageEditText.addTextChangedListener(new TextWatcher() {

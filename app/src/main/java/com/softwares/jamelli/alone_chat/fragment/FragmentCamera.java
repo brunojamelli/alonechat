@@ -66,10 +66,7 @@ public class FragmentCamera extends Fragment {
     private void takePicture() {
         FirebaseUser user = fauth.getCurrentUser();
         userName = user.getDisplayName();
-        /*Intent intentTakePicture = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        if(intentTakePicture.resolveActivity(getActivity().getPackageManager())!=null){
-            startActivityForResult(intentTakePicture,CODE_CAMERA);
-        }*/
+
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         if (takePictureIntent.resolveActivity(getActivity().getPackageManager()) != null) {
             try {
@@ -115,6 +112,7 @@ public class FragmentCamera extends Fragment {
                                     null, userName,
                                     uri.toString()
                             );
+                            Log.i("foto",friendlyMessage.toString());
                             freference.push().setValue(friendlyMessage);
                         }
                     });
@@ -125,24 +123,21 @@ public class FragmentCamera extends Fragment {
 
     @Override
     public void onResume() {
-        //takePicture();
         super.onResume();
     }
 
     @Override
     public void onPause() {
-        //takePicture();
         super.onPause();
     }
 
     private File createFile() throws IOException {
-        String timeStamp = new
-                SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
         File pasta = Environment.getExternalStoragePublicDirectory(
                 Environment.DIRECTORY_PICTURES);
         File imagem = new File(pasta.getPath() + File.separator
                 + "JPG_" + timeStamp + ".jpg");
         return imagem;
     }
-    //public void permissions
+
 }
