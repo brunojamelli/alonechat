@@ -1,6 +1,8 @@
 package com.softwares.jamelli.alone_chat;
 
 import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -26,8 +28,8 @@ public class MessageAdapterN extends RecyclerView.Adapter{
     }
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
-        MessageViewHolder mholder = (MessageViewHolder) holder;
-        FriendlyMessage mchoise = mensages.get(position);
+        final MessageViewHolder mholder = (MessageViewHolder) holder;
+        final FriendlyMessage mchoise = mensages.get(position);
         boolean isPhoto = mchoise.getPhotoUrl() != null;
         if (isPhoto) {
             mholder.messageTextView.setVisibility(View.GONE);
@@ -42,7 +44,18 @@ public class MessageAdapterN extends RecyclerView.Adapter{
             mholder.dataTv.setText(String.valueOf(mchoise.getData_envio()));
         }
         mholder.authorTextView.setText(mchoise.getName());
+        mholder.messageTextView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                //chamar mapa aqui a partir do linl
+                if(mchoise.isLocalization()){
+                    Uri link = Uri.parse(mchoise.getText());
+                    Intent i = new Intent(Intent.ACTION_VIEW,link);
+                    view.getContext().startActivity(i);
 
+                }
+            }
+        });
 
     }
 

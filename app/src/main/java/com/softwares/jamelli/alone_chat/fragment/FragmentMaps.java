@@ -73,8 +73,8 @@ public class FragmentMaps extends Fragment implements OnMapReadyCallback,
             public void onClick(View view) {
                 FirebaseUser user = fauth.getCurrentUser();
                 Date hoje = ToolBox.currentDate();
-                String urlMaps = "https://www.google.com.br/maps/@"+myLocation.getLatitude()+","+myLocation.getLongitude();
-                FriendlyMessage fm = new FriendlyMessage(hoje,urlMaps,user.getDisplayName(),null);
+                String urlMaps = "https://www.google.com.br/maps/place/"+myLocation.getLatitude()+","+myLocation.getLongitude();
+                FriendlyMessage fm = new FriendlyMessage(hoje,urlMaps,user.getDisplayName(),null,true);
                 freference.push().setValue(fm);
                 Toast.makeText(getActivity(),"Localização enviada com sucesso",Toast.LENGTH_SHORT).show();
             }

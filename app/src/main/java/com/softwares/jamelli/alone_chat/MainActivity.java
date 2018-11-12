@@ -32,6 +32,8 @@ public class MainActivity extends AppCompatActivity {
                 switch (position) {
                     case 0:
                         //tabLayout.getTabAt(0);
+                        //chama a camera
+
                     case 1:
                         //tabLayout.getTabAt(1).setIcon(R.drawable.chat);
                     case 2:

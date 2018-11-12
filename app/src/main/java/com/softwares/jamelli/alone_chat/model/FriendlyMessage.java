@@ -41,7 +41,13 @@ public class FriendlyMessage {
         this.photoUrl = photoUrl;
         this.localization = false;
     }
-
+    public FriendlyMessage(Date data_envio, String text, String name, String photoUrl,boolean localization) {
+        this.data_envio = data_envio;
+        this.text = text;
+        this.name = name;
+        this.photoUrl = photoUrl;
+        this.localization = localization;
+    }
     public boolean isLocalization() {
         return localization;
     }
