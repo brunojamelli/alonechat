@@ -30,14 +30,12 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
-import com.softwares.jamelli.alone_chat.MessageAdapter;
 import com.softwares.jamelli.alone_chat.MessageAdapterN;
 import com.softwares.jamelli.alone_chat.R;
 import com.softwares.jamelli.alone_chat.model.FriendlyMessage;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -55,11 +53,11 @@ public class FragmentChat extends Fragment{
     private static final int LOGIN_CODE = 56;
     private static final int PICTURE_CODE = 57;
     //objetos do firebase para manipulação de arquivos e acesso ao realtime database
-    private FirebaseDatabase fb;
-    private DatabaseReference msg;
+    private FirebaseDatabase fdatabase;
+    private DatabaseReference dataref;
     private ChildEventListener listener;
-    private FirebaseStorage mFirebaseStorage;
-    private StorageReference mStorageReference;
+    private FirebaseStorage fstorage;
+    private StorageReference storageref;
     //objetos da view
     private MessageAdapterN adapter;
     private ImageButton mPhotoPickerButton;
@@ -67,8 +65,8 @@ public class FragmentChat extends Fragment{
     private Button mSendButton;
     private RecyclerView rv;
     //objetos usados para a implementação do login
-    private FirebaseAuth mFirebaseAuth;
-    private FirebaseAuth.AuthStateListener mAuthStateListener;
+    private FirebaseAuth fauth;
+    private FirebaseAuth.AuthStateListener authStateListener;
     private List<FriendlyMessage> friendlyMessages;
     private String mUsername;
 
@@ -77,16 +75,10 @@ public class FragmentChat extends Fragment{
         View v = inflater.inflate(R.layout.fragment_chat, container, false);
         FacebookSdk.sdkInitialize(getContext());
         AppEventsLogger.activateApp(getContext());
-        //instanciando os objetos de acesso ao banco
-        fb = FirebaseDatabase.getInstance();
-        msg = fb.getReference().child("messages");
-        mFirebaseAuth = FirebaseAuth.getInstance();
-        //instanciando os objetos para gerenciar arquivos no firebase
-        mFirebaseStorage = FirebaseStorage.getInstance();
-        mStorageReference = mFirebaseStorage.getReference().child("photos_app_jamelli");
+        initDBandStorage();
         mUsername = ANONYMOUS;
         //implementando o listener do firebase auth
-        mAuthStateListener = new FirebaseAuth.AuthStateListener() {
+        authStateListener = new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
                 FirebaseUser user = firebaseAuth.getCurrentUser();
@@ -101,6 +93,7 @@ public class FragmentChat extends Fragment{
                     List<AuthUI.IdpConfig> providers = Arrays.asList(
                             new AuthUI.IdpConfig.EmailBuilder().build(),
                             new AuthUI.IdpConfig.GoogleBuilder().build(),
+                            new AuthUI.IdpConfig.TwitterBuilder().build(),
                             new AuthUI.IdpConfig.FacebookBuilder().setPermissions(Arrays.asList("user_friends")).build());
 
                     startActivityForResult(
@@ -113,20 +106,7 @@ public class FragmentChat extends Fragment{
                 }
             }
         };
-
-        // Initialize references to views
-        rv = v.findViewById(R.id.screenMessages);
-        mPhotoPickerButton = v.findViewById(R.id.photoPickerButton);
-        mMessageEditText =  v.findViewById(R.id.messageEditText);
-        mSendButton = v.findViewById(R.id.sendButton);
-        //Inicializando RecyclerView e o seu adapter
-        friendlyMessages = new ArrayList<>();
-        adapter = new MessageAdapterN(getContext(),friendlyMessages);
-        rv.setAdapter(adapter);
-        RecyclerView.LayoutManager layout = new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false);
-
-        rv.setLayoutManager(layout);
-
+        initViewObjects(v);
         mMessageEditText.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -148,16 +128,18 @@ public class FragmentChat extends Fragment{
             }
         });
         mMessageEditText.setFilters(new InputFilter[]{new InputFilter.LengthFilter(DEFAULT_MSG_LENGTH_LIMIT)});
+        //listener do botão que envia uma mensagem de texto para o firebase database
         mSendButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Date currentDate = ToolBox.currentDate();
                 FriendlyMessage fm = new FriendlyMessage(currentDate,mMessageEditText.getText().toString(),mUsername,null);
-                msg.push().setValue(fm);
+                dataref.push().setValue(fm);
                 // Clear input box
                 mMessageEditText.setText("");
             }
         });
+        //listener do botão que envia uma imagem da galeria para o firebase storage
         mPhotoPickerButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -173,17 +155,16 @@ public class FragmentChat extends Fragment{
     @Override
     public void onResume() {
         super.onResume();
-        mFirebaseAuth.addAuthStateListener(mAuthStateListener);
+        fauth.addAuthStateListener(authStateListener);
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        if (mAuthStateListener != null) {
-            mFirebaseAuth.removeAuthStateListener(mAuthStateListener);
+        if (authStateListener != null) {
+            fauth.removeAuthStateListener(authStateListener);
         }
         detachDatabaseReadListener();
-        //mMessageAdapter.clear();
         friendlyMessages.clear();
     }
 
@@ -199,7 +180,7 @@ public class FragmentChat extends Fragment{
             }
         }else if (requestCode == PICTURE_CODE && resultCode == RESULT_OK){
             Uri selectedImageUri = data.getData();
-            StorageReference photoref = mStorageReference.child(mUsername + "_" + selectedImageUri.getLastPathSegment());
+            StorageReference photoref = storageref.child(mUsername + "_" + selectedImageUri.getLastPathSegment());
             //para upload da imagem basta photoref.putFile(selectedImageUri);
             //addOnSuccessListener para saber quando a imagem foi enviada
             photoref.putFile(selectedImageUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
@@ -215,7 +196,7 @@ public class FragmentChat extends Fragment{
                                     null, mUsername,
                                     uri.toString()
                             );
-                            msg.push().setValue(friendlyMessage);
+                            dataref.push().setValue(friendlyMessage);
                         }
                     });
                 }
@@ -242,13 +223,13 @@ public class FragmentChat extends Fragment{
                 @Override
                 public void onCancelled(DatabaseError databaseError) {}
             };
-            msg.addChildEventListener(listener);
+            dataref.addChildEventListener(listener);
         }
     }
 
     private void detachDatabaseReadListener(){
         if(listener != null) {
-            msg.removeEventListener(listener);
+            dataref.removeEventListener(listener);
             listener = null;
         }
     }
@@ -259,8 +240,31 @@ public class FragmentChat extends Fragment{
     }
     private void onSignOutCleanUp() {
         mUsername = ANONYMOUS;
-        //mMessageAdapter.clear();
         friendlyMessages.clear();
         detachDatabaseReadListener();
+    }
+    public void initDBandStorage(){
+        //instanciando os objetos de acesso ao banco
+        fdatabase = FirebaseDatabase.getInstance();
+        dataref = fdatabase.getReference().child("messages");
+        fauth = FirebaseAuth.getInstance();
+        //instanciando os objetos para gerenciar arquivos no firebase
+        fstorage = FirebaseStorage.getInstance();
+        storageref = fstorage.getReference().child("photos_app_jamelli");
+    }
+
+    public void initViewObjects(View v){
+        // Initialize references to views
+        rv = v.findViewById(R.id.screenMessages);
+        mPhotoPickerButton = v.findViewById(R.id.photoPickerButton);
+        mMessageEditText =  v.findViewById(R.id.messageEditText);
+        mSendButton = v.findViewById(R.id.sendButton);
+        //Inicializando RecyclerView e o seu adapter
+        friendlyMessages = new ArrayList<>();
+        adapter = new MessageAdapterN(getContext(),friendlyMessages);
+        rv.setAdapter(adapter);
+        RecyclerView.LayoutManager layout = new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false);
+
+        rv.setLayoutManager(layout);
     }
 }

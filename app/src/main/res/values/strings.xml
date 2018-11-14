@@ -6,5 +6,9 @@
     <string name="facebook_app_id">717369365300176</string>
     <string name="fb_login_protocol_scheme">fb717369365300176</string>
     <string name="facebook_login_protocol_scheme" translatable="false">fb717369365300176</string>
+    <string name="twitter_consumer_key" translatable="false">QuBNibeWeCMLMLOwIvlult8Rv</string>
+    <string name="twitter_consumer_secret" translatable="false">E9hGqWHJAI9GCOZ88CuxYnNAhFrPHlCIAoIDPQALK05eRXKjAi</string>
+
+
 
 </resources>

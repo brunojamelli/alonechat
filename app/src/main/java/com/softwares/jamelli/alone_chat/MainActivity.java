@@ -16,9 +16,10 @@ import android.view.MenuItem;
 import com.firebase.ui.auth.AuthUI;
 
 public class MainActivity extends AppCompatActivity {
-    TabLayout tabLayout;
-    ViewPager vp;
-    PagerAdapter pa;
+    private TabLayout tabLayout;
+    private ViewPager vp;
+    private PagerAdapter pa;
+
     private final int PERMISSION_REQUEST = 11;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
