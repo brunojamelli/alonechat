@@ -11,6 +11,6 @@
         android:text="Take Picture"
         android:textColor="@color/colorWhite"
         android:textStyle="bold"
-        android:background="@color/colorLaranja"/>
+        android:background="@color/black"/>
 
 </LinearLayout>
