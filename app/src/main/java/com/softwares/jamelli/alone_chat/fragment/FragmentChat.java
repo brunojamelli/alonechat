@@ -264,7 +264,8 @@ public class FragmentChat extends Fragment{
         adapter = new MessageAdapterN(getContext(),friendlyMessages);
         rv.setAdapter(adapter);
         RecyclerView.LayoutManager layout = new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false);
-
+        ((LinearLayoutManager) layout).setStackFromEnd(true);
+        ((LinearLayoutManager) layout).setReverseLayout(false);
         rv.setLayoutManager(layout);
     }
 }
